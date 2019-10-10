@@ -87,29 +87,26 @@ class TelegramAuthController implements RequestHandlerInterface
             return new HtmlResponse($content);
         }
 
-        $suggestions = [
-            'username' => array_get($auth, 'username'),
-            'avatarUrl' => array_get($auth, 'photo_url'),
-        ];
+        $suggestions = [];
+        if (array_get($auth, 'username')) $suggestions['username'] = array_get($auth, 'username');
+        if (array_get($auth, 'photo_url')) $suggestions['avatarUrl'] = array_get($auth, 'photo_url');
 
 
         return $this->authResponse->make(
             $provider, array_get($auth, 'id'),
             function (Registration $registration) use ($suggestions) {
-                $registration
-                    ->suggestUsername($suggestions['username'])
-                    ->setPayload($suggestions);
+                if ($suggestions['username']) {
+                    $registration->suggestUsername($suggestions['username']);
+                }
+                $registration->setPayload($suggestions);
             }
         );
     }
 
     protected function checkTelegramId($provider, $identifier)
     {
-        $query = LoginProvider::where(compact('provider', 'identifier'))->first(); // ::where('provider', '=', $provider);
-        // $query->where('identifier', '=', (int)$identifier);
-        // $provider = $query->first();
-
-        return $query;
+        $provider = LoginProvider::where(compact('provider', 'identifier'))->first();
+        return $provider;
     }
 
     /**

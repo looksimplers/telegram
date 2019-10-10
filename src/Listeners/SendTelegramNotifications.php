@@ -40,10 +40,7 @@ class SendTelegramNotifications
 
     protected function getTelegramId(User $actor)
     {
-        $query = LoginProvider::where('user_id', '=', $actor->id);
-        $query->where('provider', '=', 'telegram');
-        $provider = $query->first();
-
+        $provider = $actor->LoginProviders()->where('provider', '=', 'telegram')->first();
         return $provider->identifier;
     }
 }
