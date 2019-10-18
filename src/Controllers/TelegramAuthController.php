@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Telegram\Controllers;
+namespace Dexif\Telegram\Controllers;
 
 use Flarum\Forum\Auth\Registration;
 use Flarum\Forum\Auth\ResponseFactory;
@@ -28,7 +28,7 @@ class TelegramAuthController implements RequestHandlerInterface
         $this->settings = $settings;
         $this->url = $url;
 
-        $token = $settings->get('flagrow-telegram.botToken');
+        $token = $settings->get('dexif-telegram.botToken');
 
         if (!$token) {
             throw new Exception('No bot token configured for Telegram');
@@ -46,12 +46,12 @@ class TelegramAuthController implements RequestHandlerInterface
 
         if (!array_key_exists('hash', $auth)) {
             $settings = [
-                'telegram-login' => $this->settings->get('flagrow-telegram.botUsername'),
+                'telegram-login' => $this->settings->get('dexif-telegram.botUsername'),
                 'size' => 'large',
                 'auth-url' => $this->url->to('auth.telegram'),
             ];
 
-            if ($this->settings->get('flagrow-telegram.enableNotifications')) {
+            if ($this->settings->get('dexif-telegram.enableNotifications')) {
                 $settings['request-access'] = 'write';
             }
 
@@ -130,7 +130,7 @@ class TelegramAuthController implements RequestHandlerInterface
 
         sort($data_check_arr);
         $data_check_string = implode("\n", $data_check_arr);
-        $secret_key = hash('sha256', $this->settings->get('flagrow-telegram.botToken'), true);
+        $secret_key = hash('sha256', $this->settings->get('dexif-telegram.botToken'), true);
         $hash = hash_hmac('sha256', $data_check_string, $secret_key);
 
         if (strcmp($hash, $check_hash) !== 0) {

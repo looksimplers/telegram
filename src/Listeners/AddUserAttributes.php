@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Telegram\Listeners;
+namespace Dexif\Telegram\Listeners;
 
 use Flarum\Api\Serializer\CurrentUserSerializer;
 use Flarum\Api\Event\Serializing;
@@ -15,7 +15,7 @@ class AddUserAttributes
         if ($event->isSerializer(CurrentUserSerializer::class)) {
             // $event->attributes['canReceiveTelegramNotifications'] = !is_null($event->model->attributes->flagrow_telegram_id);
             $event->attributes['canReceiveTelegramNotifications'] = !is_null($this->getTelegramId($event->model));
-            $event->attributes['flagrowTelegramError'] = $event->model->flagrow_telegram_error;
+            $event->attributes['dexifTelegramError'] = $event->model->flagrow_telegram_error;
         }
     }
 

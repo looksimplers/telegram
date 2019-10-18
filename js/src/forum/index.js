@@ -5,9 +5,9 @@ import addLoginButton from './addLoginButton';
 import addNotificationMethod from './addNotificationMethod';
 
 
-app.initializers.add('flagrow-telegram', () => {
+app.initializers.add('dexif-telegram', () => {
     User.prototype.canReceiveTelegramNotifications = Model.attribute('canReceiveTelegramNotifications');
-    User.prototype.flagrowTelegramError = Model.attribute('flagrowTelegramError');
+    User.prototype.dexifTelegramError = Model.attribute('dexifTelegramError');
 
     addLoginButton();
     addNotificationMethod();

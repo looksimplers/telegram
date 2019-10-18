@@ -1,4 +1,4 @@
-flagrow-telegram:
+dexif-telegram:
     admin:
         settings:
             title: Настройки Telegram

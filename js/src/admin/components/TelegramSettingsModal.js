@@ -7,25 +7,25 @@ export default class TelegramSettingsModal extends SettingsModal {
   }
 
   title() {
-    return app.translator.trans('flagrow-telegram.admin.settings.title');
+    return app.translator.trans('dexif-telegram.admin.settings.title');
   }
 
   form() {
     return [
       <div className="Form-group">
-        <label>{app.translator.trans('flagrow-telegram.admin.settings.field.botUsername')}</label>
-        <input className="FormControl" bidi={this.setting('flagrow-telegram.botUsername')} placeholder="SampleBot" />
+        <label>{app.translator.trans('dexif-telegram.admin.settings.field.botUsername')}</label>
+        <input className="FormControl" bidi={this.setting('dexif-telegram.botUsername')} placeholder="SampleBot" />
       </div>,
       <div className="Form-group">
-        <label>{app.translator.trans('flagrow-telegram.admin.settings.field.botToken')}</label>
-        <input className="FormControl" bidi={this.setting('flagrow-telegram.botToken')} placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" />
+        <label>{app.translator.trans('dexif-telegram.admin.settings.field.botToken')}</label>
+        <input className="FormControl" bidi={this.setting('dexif-telegram.botToken')} placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" />
       </div>,
       <div className="Form-group" style="min-height:50px">
-        <label>{app.translator.trans('flagrow-telegram.admin.settings.field.enableNotifications')}</label>
+        <label>{app.translator.trans('dexif-telegram.admin.settings.field.enableNotifications')}</label>
             <Switch
-                state={[true, '1'].indexOf(this.setting('flagrow-telegram.enableNotifications')()) !== -1}
-                onchange={this.setting('flagrow-telegram.enableNotifications')}
-                children={app.translator.trans('flagrow-telegram.admin.settings.field.enableNotifications')} />
+                state={[true, '1'].indexOf(this.setting('dexif-telegram.enableNotifications')()) !== -1}
+                onchange={this.setting('dexif-telegram.enableNotifications')}
+                children={app.translator.trans('dexif-telegram.admin.settings.field.enableNotifications')} />
       </div>
     ];
   }

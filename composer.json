@@ -1,10 +1,10 @@
 {
-    "name": "flagrow/telegram",
+    "name": "dexif/telegram",
     "description": "Telegram login and notifications for Flarum",
     "keywords": [
         "extension",
         "flarum",
-        "flagrow",
+        "dexif",
         "telegram",
         "auth",
         "notifications"
@@ -24,28 +24,28 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/flagrow/telegram/issues",
-        "source": "https://github.com/flagrow/telegram"
+        "issues": "https://github.com/dexif/telegram/issues",
+        "source": "https://github.com/dexif/telegram"
     },
     "require": {
         "flarum/core": "^0.1.0-beta.10"
     },
     "extra": {
         "flarum-extension": {
-            "title": "Flagrow Telegram",
+            "title": "Telegram",
             "icon": {
                 "name": "fab fa-telegram-plane",
                 "backgroundColor": "#f4f4f4",
                 "color": "#5f4bb6"
             }
         },
-        "flagrow": {
-            "discuss": "https://discuss.flarum.org/d/9033-telegram-login-and-notifications-by-flagrow"
+        "dexif": {
+            "discuss": "https://discuss.flarum.org/d/9033-telegram-login-and-notifications-by-dexif"
         }
     },
     "autoload": {
         "psr-4": {
-            "Flagrow\\Telegram\\": "src/"
+            "Dexif\\Telegram\\": "src/"
         }
     }
 }

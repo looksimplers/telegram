@@ -1,8 +1,8 @@
 <?php
 
-namespace Flagrow\Telegram\Listeners;
+namespace Dexif\Telegram\Listeners;
 
-use Flagrow\Telegram\Notifications\TelegramMailer;
+use Dexif\Telegram\Notifications\TelegramMailer;
 use Flarum\Notification\Blueprint\BlueprintInterface;
 use Flarum\User\User;
 use Flarum\Notification\Event\Sending;
@@ -22,12 +22,14 @@ class SendTelegramNotifications
          * @var $mailer TelegramMailer
          */
         $mailer = app(TelegramMailer::class);
+        // var_dump(json_encode($event));
         foreach ($event->users as $user) {
             $telegram_id = $this->shouldSendTelegramToUser($event->blueprint, $user);
             if ($telegram_id) {
                 $mailer->send($event->blueprint, $user, $telegram_id);
             }
         }
+        // exit(1);
     }
 
     protected function shouldSendTelegramToUser($blueprint, User $user)
@@ -41,6 +43,8 @@ class SendTelegramNotifications
     protected function getTelegramId(User $actor)
     {
         $provider = $actor->LoginProviders()->where('provider', '=', 'telegram')->first();
+        // var_dump(json_encode($provider));
+        // var_dump(json_encode($actor->username));
         return $provider->identifier;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Flagrow\Telegram\Listeners;
+namespace Dexif\Telegram\Listeners;
 
 use Flarum\User\User;
 use Flarum\Event\ConfigureNotificationTypes;
@@ -23,7 +23,7 @@ class EnableTelegramNotifications
 
     public function configure(ConfigureNotificationTypes $event)
     {
-        if (!$this->settings->get('flagrow-telegram.enableNotifications')) {
+        if (!$this->settings->get('dexif-telegram.enableNotifications')) {
             return;
         }
 

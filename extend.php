@@ -1,8 +1,8 @@
 <?php
 
-namespace Flagrow\Telegram;
-use Flagrow\Telegram\Controllers\TelegramAuthController;
-use Flagrow\Telegram\Controllers\TelegramBotController;
+namespace Dexif\Telegram;
+use Dexif\Telegram\Controllers\TelegramAuthController;
+use Dexif\Telegram\Controllers\TelegramBotController;
 use Flarum\Extend;
 
 use Illuminate\Contracts\Events\Dispatcher;
