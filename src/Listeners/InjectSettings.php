@@ -1,6 +1,6 @@
 <?php
 
-namespace Dexif\Telegram\Listeners;
+namespace Nodeloc\Telegram\Listeners;
 
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Event\Serializing;
@@ -16,7 +16,7 @@ class InjectSettings
         $this->settings = $settings;
     }
 
-    public function subscribe(Dispatcher $events)
+    public function subscribe($events)
     {
         $events->listen(Serializing::class, [$this, 'settings']);
     }
@@ -24,8 +24,8 @@ class InjectSettings
     public function settings(Serializing $event)
     {
         if ($event->serializer instanceof ForumSerializer) {
-            $event->attributes['dexif-telegram.enableNotifications'] = (bool)$this->settings->get('dexif-telegram.enableNotifications');
-            $event->attributes['dexif-telegram.botUsername'] = $this->settings->get('dexif-telegram.botUsername');
+            $event->attributes['nodeloc-telegram.enableNotifications'] = (bool)$this->settings->get('nodeloc-telegram.enableNotifications');
+            $event->attributes['nodeloc-telegram.botUsername'] = $this->settings->get('nodeloc-telegram.botUsername');
         }
     }
 }

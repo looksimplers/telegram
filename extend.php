@@ -1,8 +1,8 @@
 <?php
 
-namespace Dexif\Telegram;
-use Dexif\Telegram\Controllers\TelegramAuthController;
-use Dexif\Telegram\Controllers\TelegramBotController;
+namespace Nodeloc\Telegram;
+use Nodeloc\Telegram\Controllers\TelegramAuthController;
+use Nodeloc\Telegram\Controllers\TelegramBotController;
 use Flarum\Extend;
 
 use Illuminate\Contracts\Events\Dispatcher;
@@ -15,13 +15,11 @@ return [
         ->js(__DIR__.'/js/dist/forum.js')
         ->css(__DIR__.'/resources/less/forum.less'),
     (new Extend\Locales(__DIR__ . '/resources/locale')),
-    function (Dispatcher $events, Factory $view) {
-        $events->listen(Serializing::class, Listeners\AddUserAttributes::class);
-        $events->subscribe(Listeners\SendTelegramNotifications::class);
-        $events->subscribe(Listeners\EnableTelegramNotifications::class);
-        $events->subscribe(Listeners\InjectSettings::class);
-
-    },
+    (new Extend\Event)
+        ->listen(Serializing::class, Listeners\AddUserAttributes::class)
+        ->subscribe(Listeners\SendTelegramNotifications::class)
+        ->subscribe(Listeners\EnableTelegramNotifications::class)
+        ->subscribe(Listeners\InjectSettings::class),
     (new Extend\Frontend('admin'))
         ->js(__DIR__.'/js/dist/admin.js'),
 

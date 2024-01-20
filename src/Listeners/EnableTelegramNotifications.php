@@ -1,6 +1,6 @@
 <?php
 
-namespace Dexif\Telegram\Listeners;
+namespace Nodeloc\Telegram\Listeners;
 
 use Flarum\User\User;
 use Flarum\Event\ConfigureNotificationTypes;
@@ -16,14 +16,14 @@ class EnableTelegramNotifications
         $this->settings = $settings;
     }
 
-    public function subscribe(Dispatcher $events)
+    public function subscribe($events)
     {
         $events->listen(ConfigureNotificationTypes::class, [$this, 'configure']);
     }
 
     public function configure(ConfigureNotificationTypes $event)
     {
-        if (!$this->settings->get('dexif-telegram.enableNotifications')) {
+        if (!$this->settings->get('nodeloc-telegram.enableNotifications')) {
             return;
         }
 

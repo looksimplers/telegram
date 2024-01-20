@@ -1,4 +1,4 @@
-dexif-telegram:
+nodeloc-telegram:
     admin:
         settings:
             title: Telegram Settings

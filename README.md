@@ -1,21 +1,19 @@
-# Telegram login and notifications by Dexif (rewritten original extension of [Flagrow](https://discuss.flarum.org/d/1832-flagrow-extension-developer-group))
+# Telegram login and notifications by Nodeloc (rewritten original extension of [Flagrow](https://discuss.flarum.org/d/1832-flagrow-extension-developer-group))
 
-[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dexif/telegram/blob/master/LICENSE.md) [![Latest Stable Version](https://img.shields.io/packagist/v/dexif/telegram.svg)](https://packagist.org/packages/dexif/telegram) [![Total Downloads](https://img.shields.io/packagist/dt/dexif/telegram.svg)](https://packagist.org/packages/dexif/telegram)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nodeloc/telegram/blob/master/LICENSE.md) [![Latest Stable Version](https://img.shields.io/packagist/v/nodeloc/telegram.svg)](https://packagist.org/packages/nodeloc/telegram) [![Total Downloads](https://img.shields.io/packagist/dt/nodeloc/telegram.svg)](https://packagist.org/packages/nodeloc/telegram)
 
 This extension adds a "Log in with Telegram" button that uses the new [Telegram Login widget](https://telegram.org/blog/login) and add an option to receive notifications via Telegram as well.
 
 ## Installation
 
-Use [Bazaar](https://discuss.flarum.org/d/5151-flagrow-bazaar-the-extension-marketplace) or install manually:
-
 ```bash
-composer require dexif/telegram
+composer require nodeloc/telegram
 ```
 
 ## Updating
 
 ```bash
-composer update dexif/telegram
+composer update nodeloc/telegram
 php flarum migrate
 php flarum cache:clear
 ```
@@ -40,8 +38,8 @@ Please include as many details as possible. You can use `php flarum info` to get
 
 ## Links
 
-- [Flarum Discuss post](https://discuss.flarum.org/d/9033-telegram-login-and-notifications-by-flagrow)
-- [Source code on GitHub](https://github.com/dexif/telegram)
-- [Report an issue](https://github.com/dexif/telegram/issues)
-- [Download via Packagist](https://packagist.org/packages/dexif/telegram)
+- [Flarum Discuss post](https://www.nodeloc.com)
+- [Source code on GitHub](https://github.com/nodeloc/telegram)
+- [Report an issue](https://github.com/nodeloc/telegram/issues)
+- [Download via Packagist](https://packagist.org/packages/nodeloc/telegram)
 

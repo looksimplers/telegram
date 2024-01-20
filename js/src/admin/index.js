@@ -1,7 +1,28 @@
-import app from 'flarum/app';
+import app from 'flarum/admin/app';
 
-import TelegramSettingsModal from './components/TelegramSettingsModal';
+app.initializers.add('nodeloc-telegram', () => {
+    app.extensionData
+        .for('nodeloc-telegram')
+        .registerSetting(
+            {
+                setting: 'nodeloc-telegram.botUsername',
+                type: 'text',
+                label: app.translator.trans('nodeloc-telegram.admin.settings.field.botUsername'),
+            },
+            15
+        )
+        .registerSetting(
+            {
+                setting: 'nodeloc-telegram.botToken',
+                type: 'text',
+                label: app.translator.trans('nodeloc-telegram.admin.settings.field.botToken'),
+            },
+            15
+        )
+        .registerSetting({
+            setting: 'nodeloc-telegram.enableNotifications',
+            type: 'boolean',
+            label: app.translator.trans('nodeloc-telegram.admin.settings.field.enableNotifications'),
+        });
 
-app.initializers.add('dexif-telegram', () => {
-  app.extensionSettings['dexif-telegram'] = () => app.modal.show(new TelegramSettingsModal());
 });

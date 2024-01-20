@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) Dexif and Flagrow
+Copyright (c) Nodeloc and Flagrow
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

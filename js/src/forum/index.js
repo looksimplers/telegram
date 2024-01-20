@@ -5,9 +5,9 @@ import addLoginButton from './addLoginButton';
 import addNotificationMethod from './addNotificationMethod';
 
 
-app.initializers.add('dexif-telegram', () => {
+app.initializers.add('nodeloc-telegram', () => {
     User.prototype.canReceiveTelegramNotifications = Model.attribute('canReceiveTelegramNotifications');
-    User.prototype.dexifTelegramError = Model.attribute('dexifTelegramError');
+    User.prototype.nodelocTelegramError = Model.attribute('nodelocTelegramError');
 
     addLoginButton();
     addNotificationMethod();

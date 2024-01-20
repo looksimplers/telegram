@@ -1,10 +1,10 @@
 {
-    "name": "dexif/telegram",
+    "name": "nodeloc/telegram",
     "description": "Telegram login and notifications for Flarum",
     "keywords": [
         "extension",
         "flarum",
-        "dexif",
+        "nodeloc",
         "telegram",
         "auth",
         "notifications"
@@ -21,14 +21,20 @@
             "name": "Evgenij Spitsyn",
             "email": "evgeniy@spitsyn.net",
             "homepage": "https://spitsyn.net/"
+        },
+        {
+            "name": "JameSupeReal",
+            "email": "james@nodeloc.com",
+            "homepage": "https://www.nodeloc.com/"
         }
     ],
     "support": {
-        "issues": "https://github.com/dexif/telegram/issues",
-        "source": "https://github.com/dexif/telegram"
+        "issues": "https://github.com/nodeloc/telegram/issues",
+        "source": "https://github.com/nodeloc/telegram"
     },
     "require": {
-        "flarum/core": "^0.1.0-beta.10"
+        "flarum/core": "^1.8.0",
+        "irazasyed/telegram-bot-sdk": "^3.9"
     },
     "extra": {
         "flarum-extension": {
@@ -39,13 +45,13 @@
                 "color": "#5f4bb6"
             }
         },
-        "dexif": {
-            "discuss": "https://discuss.flarum.org/d/9033-telegram-login-and-notifications-by-dexif"
+        "nodeloc": {
+            "discuss": "https://www.nodeloc.com"
         }
     },
     "autoload": {
         "psr-4": {
-            "Dexif\\Telegram\\": "src/"
+            "Nodeloc\\Telegram\\": "src/"
         }
     }
 }

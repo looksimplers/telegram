@@ -1,17 +1,17 @@
 import {extend} from 'flarum/extend';
-import app from 'flarum/app';
 import LogInButtons from 'flarum/components/LogInButtons';
-import LogInButton from 'flarum/components/LogInButton';
 
 export default function () {
     extend(LogInButtons.prototype, 'items', function (items) {
-        items.add('dexif-telegram',
-            <LogInButton
-                className="Button LogInButton--telegram"
-                icon="fab fa-telegram-plane"
-                path="/auth/telegram">
-                {app.translator.trans('dexif-telegram.forum.log_in_with_telegram_button')}
-            </LogInButton>
+        const currentDomain = window.location.origin;
+        // Replace the Telegram widget script
+        items.add('nodeloc-telegram',
+            m('script', { async: true, src: 'https://telegram.org/js/telegram-widget.js?22',
+                'data-telegram-login': 'nodeloc_bot',
+                'data-size': 'large',
+                'data-radius': '10',
+                'data-auth-url':  currentDomain + '/auth/telegram',
+                'data-request-access': 'write' })
         );
     });
 }
