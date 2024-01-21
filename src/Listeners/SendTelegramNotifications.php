@@ -2,6 +2,8 @@
 
 namespace Nodeloc\Telegram\Listeners;
 
+use Flarum\Notification\Driver\NotificationDriverInterface;
+use Illuminate\Contracts\Queue\Queue;
 use Nodeloc\Telegram\Notifications\TelegramMailer;
 use Flarum\Notification\Blueprint\BlueprintInterface;
 use Flarum\User\User;
@@ -10,34 +12,37 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Flarum\User\LoginProvider;
 use Flarum\Settings\SettingsRepositoryInterface;
 
-class SendTelegramNotifications
+class SendTelegramNotifications implements  NotificationDriverInterface
 {
-    protected $settings;
+    /**
+     * @var Queue
+     */
+    protected $queue;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    public function __construct(Queue $queue)
     {
-        $this->settings = $settings;
+        $this->queue = $queue;
     }
+
     public function subscribe($events)
     {
         $events->listen(Sending::class, [$this, 'send']);
     }
 
-    public function send($event)
+    /**
+     * {@inheritDoc}
+     * @throws \Exception
+     */
+    public function send(BlueprintInterface $blueprint, array $users): void
     {
-        /**
-         * @var $mailer TelegramMailer
-         */
-        $mailer = app(TelegramMailer::class);
-        // var_dump(json_encode($event));
-        foreach ($event->users as $user) {
-            $telegram_id = $this->shouldSendTelegramToUser($event->blueprint, $user);
-            if ($telegram_id) {
-                $mailer->send($event->blueprint, $user, $telegram_id);
-            }
+        // The `send` method is responsible for determining any notifications need to be sent.
+        // If not (for example, if there are no users to send to), there's no point in scheduling a job.
+        // We HIGHLY recommend that notifications are sent via a queue job for performance reasons.
+        if (count($users)) {
+            $this->queue->push(new TelegramMailer($blueprint, $users));
         }
-        // exit(1);
     }
+
 
     protected function shouldSendTelegramToUser($blueprint, $user)
     {
@@ -53,5 +58,11 @@ class SendTelegramNotifications
         // var_dump(json_encode($provider));
         // var_dump(json_encode($actor->username));
         return $provider->identifier;
+    }
+
+    public function registerType(string $blueprintClass, array $driversEnabledByDefault): void
+    {
+        var_dump($driversEnabledByDefault);
+        app('flarum.notification.types')->addType($blueprintClass, $driversEnabledByDefault);
     }
 }

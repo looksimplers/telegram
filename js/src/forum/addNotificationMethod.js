@@ -9,12 +9,10 @@ export default function () {
         if (!app.forum.attribute('nodeloc-telegram.enableNotifications')) {
             return;
         }
-
         let user = app.session.user;
         if (!user || !user.canReceiveTelegramNotifications()) {
             return;
         }
-
         // Add telegram notifications method column
         items.add('telegram', {
             name: 'telegram',
@@ -26,6 +24,7 @@ export default function () {
         if (!app.forum.attribute('nodeloc-telegram.enableNotifications')) {
             return;
         }
+
         let user = app.session.user;
         if (user && !user.canReceiveTelegramNotifications()) {
             // add button to link current account with telegram
@@ -47,12 +46,10 @@ export default function () {
         if (!app.forum.attribute('nodeloc-telegram.enableNotifications')) {
             return;
         }
-
         let user = app.session.user;
         if (!user || !user.nodelocTelegramError()) {
             return;
         }
-
         const botUsername = app.forum.attribute('nodeloc-telegram.botUsername');
 
         items.add('nodelocTelegramError', {

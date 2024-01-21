@@ -8,10 +8,9 @@ use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Exception;
-use Flarum\Http\Response as FlarumResponse;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Client;
+use Laminas\Diactoros\Response\HtmlResponse;
 use Flarum\User\LoginProvider;
 
 class TelegramAuthController implements RequestHandlerInterface
@@ -32,52 +31,49 @@ class TelegramAuthController implements RequestHandlerInterface
         if (!$token) {
             throw new Exception('No bot token configured for Telegram');
         }
-
-        $this->client = new Client([
-            'base_uri' => 'https://api.telegram.org/bot' . $token . '/',
-        ]);
     }
 
     public function handle(Request $request): ResponseInterface
     {
         $provider = 'telegram';
-        $auth = $request->getQueryParams();
 
         try {
-            $auth = checkTelegramAuthorization($_GET);
-
+            $auth = $this->checkTelegramAuthorization($_GET);
             $user = $request->getAttribute('actor');
+
             if ($user && $user->id) {
-                $identifier = array_get($auth, 'id');
-                // var_dump($this->checkTelegramId($identifier));exit(1);
+                $identifier = $auth['id'] ?? null;
+
                 if ($this->checkTelegramId($provider, $identifier)) {
                     $content = '<div style="text-align:center;font-family:Arial;">You can\'t link this telegram account to this user.</div>';
                     return new HtmlResponse($content);
                 }
+
                 $user->loginProviders()->create(compact('provider', 'identifier'));
-                $content = '<script>window.close();window.opener.document.location.reload(true);</script>';
+                $content = '<script>window.opener.document.location.reload(true);</script>';
 
                 return new HtmlResponse($content);
             }
 
             $suggestions = [];
-            if (array_get($auth, 'username')) $suggestions['username'] = array_get($auth, 'username');
-            if (array_get($auth, 'photo_url')) $suggestions['avatarUrl'] = array_get($auth, 'photo_url');
+            if ($auth['username']) $suggestions['username'] = $auth['username'];
+            if ($auth['photo_url']) $suggestions['avatar_url'] = $auth['photo_url'];
 
 
             return $this->authResponse->make(
-                $provider, array_get($auth, 'id'),
-                function (Registration $registration) use ($suggestions) {
-                    if ($suggestions['username']) {
-                        $registration->suggestUsername($suggestions['username']);
-                    }
+                $provider, $auth['id'], function (Registration $registration) use ($suggestions) {
+                    // 设置 Telegram 提供的信息
+                    $registration->provide('username', $suggestions['username']);
+                    $registration->provide('avatar_url', $suggestions['avatar_url']);
                     $registration->setPayload($suggestions);
-                }
+            }
             );
         } catch (Exception $e) {
-            die ($e->getMessage());
+            // 在异常情况下返回错误响应
+            return new HtmlResponse('Error: ' . $e->getMessage(), 500);
         }
     }
+
 
     protected function checkTelegramId($provider, $identifier)
     {

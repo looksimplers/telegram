@@ -2,34 +2,34 @@
 
 namespace Nodeloc\Telegram\Listeners;
 
-use Flarum\Api\Serializer\CurrentUserSerializer;
-use Flarum\Api\Event\Serializing;
+use Flarum\Api\Serializer\UserSerializer;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\LoginProvider;
 use Flarum\User\User;
-use Flarum\Settings\SettingsRepositoryInterface;
+use Illuminate\Contracts\Events\Dispatcher;
 
 class AddUserAttributes
 {
     protected $settings;
+    protected $events;
 
-    public function __construct(SettingsRepositoryInterface $settings)
+    public function __construct(SettingsRepositoryInterface $settings, Dispatcher $events)
     {
         $this->settings = $settings;
-    }
-    public function handle($event)
-    {
-        if ($event->isSerializer(CurrentUserSerializer::class)) {
-            // $event->attributes['canReceiveTelegramNotifications'] = !is_null($event->model->attributes->flagrow_telegram_id);
-            $event->attributes['canReceiveTelegramNotifications'] = !is_null($this->getTelegramId($event->model));
-            $event->attributes['nodelocTelegramError'] = $event->model->flagrow_telegram_error;
-        }
+        $this->events = $events;
     }
 
+    public function __invoke(UserSerializer $serializer, User $user)
+    {
+        $attributes['canReceiveTelegramNotifications'] = !is_null($this->getTelegramId($user));
+        $attributes['nodelocTelegramError'] = $user->flagrow_telegram_error;
+        return $attributes;
+    }
     /**
      * @param User $actor
      * @return int
      */
-    protected function getTelegramId($actor)
+    protected function getTelegramId(User $actor)
     {
         $query = LoginProvider::where('user_id', '=', $actor->id);
 

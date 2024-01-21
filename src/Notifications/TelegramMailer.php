@@ -10,7 +10,7 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\View\Factory;
-
+use Flarum\Notification\Driver\NotificationDriverInterface;
 class TelegramMailer
 {
     protected $client;
@@ -31,8 +31,9 @@ class TelegramMailer
         $this->views = $views;
     }
 
-    public function send(BlueprintInterface $blueprint, User $user, $telegram_id)
+    public function send(BlueprintInterface $blueprint, array $user): void
     {
+        $telegram_id ="";
         if ($blueprint instanceof MailableInterface) {
             $view = $this->pickBestView($blueprint->getEmailView());
 
@@ -112,4 +113,5 @@ class TelegramMailer
 
         throw new Exception('No view found for that mailable');
     }
+
 }

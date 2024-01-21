@@ -16,7 +16,7 @@ class EnableTelegramNotifications
         $this->settings = $settings;
     }
 
-    public function subscribe($events)
+    public function subscribe(Dispatcher $events)
     {
         $events->listen(ConfigureNotificationTypes::class, [$this, 'configure']);
     }

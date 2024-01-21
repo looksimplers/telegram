@@ -5,7 +5,6 @@ namespace Nodeloc\Telegram\Listeners;
 use Flarum\Api\Serializer\ForumSerializer;
 use Flarum\Api\Event\Serializing;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Illuminate\Contracts\Events\Dispatcher;
 
 class InjectSettings
 {
