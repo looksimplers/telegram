@@ -1,4 +1,5 @@
 import {extend} from 'flarum/extend';
+import User from 'flarum/models/User';
 import LogInButtons from 'flarum/components/LogInButtons';
 import app from 'flarum/app';
 
