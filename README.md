@@ -4,6 +4,8 @@
 
 This extension adds a "Log in with Telegram" button that uses the new [Telegram Login widget](https://telegram.org/blog/login) and add an option to receive notifications via Telegram as well.
 
+Notification is not work well now.
+
 ## Installation
 
 ```bash
