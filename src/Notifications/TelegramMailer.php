@@ -76,7 +76,7 @@ class TelegramMailer
                 }
             } catch (ClientException $exception) {
                 $response = $exception->getResponse();
-                if ($response->getStatusCode() !== 403) {
+                if ($response && $response->getStatusCode() !== 403) {
                     throw $exception;
                 }
                 $user->flagrow_telegram_error = 'unauthorized';
@@ -88,17 +88,7 @@ class TelegramMailer
 
                 $user->save();
             } catch (TelegramSDKException $exception) {
-                $response = $exception->getResponse();
-                if ($response->getStatusCode() !== 403) {
-                    throw $exception;
-                }
                 $user->flagrow_telegram_error = 'unauthorized';
-                $json = json_decode($response->getBody()->getContents(), true);
-
-                if ($json && str_contains(Arr::get($json, 'description', ''), 'blocked by the user')) {
-                    $user->flagrow_telegram_error = 'blocked';
-                }
-
                 $user->save();
             }
         }
