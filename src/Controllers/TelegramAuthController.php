@@ -29,7 +29,7 @@ class TelegramAuthController implements RequestHandlerInterface
         $token = $settings->get('nodeloc-telegram.botToken');
 
         if (!$token) {
-            throw new Exception('No bot token configured for Telegram');
+            throw new Exception('No bot token configured for TelegramProvide');
         }
     }
 
@@ -62,7 +62,7 @@ class TelegramAuthController implements RequestHandlerInterface
 
             return $this->authResponse->make(
                 $provider, $auth['id'], function (Registration $registration) use ($suggestions) {
-                    // 设置 Telegram 提供的信息
+                    // 设置 TelegramProvide 提供的信息
                     $registration->provide('username', $suggestions['username']);
                     $registration->provide('avatar_url', $suggestions['avatar_url']);
                     $registration->setPayload($suggestions);
@@ -93,7 +93,7 @@ class TelegramAuthController implements RequestHandlerInterface
         $secret_key = hash('sha256', $this->settings->get('nodeloc-telegram.botToken'), true);
         $hash = hash_hmac('sha256', $data_check_string, $secret_key);
         if (strcmp($hash, $check_hash) !== 0) {
-            throw new Exception('Data is NOT from Telegram');
+            throw new Exception('Data is NOT from TelegramProvide');
         }
         if ((time() - $auth_data['auth_date']) > 86400) {
             throw new Exception('Data is outdated');

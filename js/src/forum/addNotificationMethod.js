@@ -9,6 +9,10 @@ export default function () {
         if (!app.forum.attribute('nodeloc-telegram.enableNotifications')) {
             return;
         }
+        if (!app.session || !app.session.user) {
+            return;
+        }
+
         let user = app.session.user;
         if (!user || !user.canReceiveTelegramNotifications()) {
             return;
@@ -22,6 +26,9 @@ export default function () {
     });
     extend(SettingsPage.prototype, 'accountItems', function (items) {
         if (!app.forum.attribute('nodeloc-telegram.enableNotifications')) {
+            return;
+        }
+        if (!app.session || !app.session.user) {
             return;
         }
 
@@ -46,6 +53,10 @@ export default function () {
         if (!app.forum.attribute('nodeloc-telegram.enableNotifications')) {
             return;
         }
+        if (!app.session || !app.session.user) {
+            return;
+        }
+
         let user = app.session.user;
         if (!user || !user.nodelocTelegramError()) {
             return;

@@ -9,8 +9,8 @@ nodeloc-telegram:
                 enableNotifications: Enable Notifications
 
     forum:
-        log_in_with_telegram_button: Log in with TelegramProvide
-        link_telegram_button: Link TelegramProvide
+        log_in_with_telegram_button: 使用Telegram登录
+        link_telegram_button: 关联TG账号
 
         settings:
             notify_by_telegram_heading: Telegram
