@@ -6,12 +6,14 @@ use Flarum\Forum\Auth\Registration;
 use Flarum\Forum\Auth\ResponseFactory;
 use Flarum\Http\UrlGenerator;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Laminas\Diactoros\Stream;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Exception;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Flarum\User\LoginProvider;
+use Flarum\Locale\Translator;
 
 class TelegramAuthController implements RequestHandlerInterface
 {
@@ -45,14 +47,11 @@ class TelegramAuthController implements RequestHandlerInterface
                 $identifier = $auth['id'] ?? null;
 
                 if ($this->checkTelegramId($provider, $identifier)) {
-                    $content = '<div style="text-align:center;font-family:Arial;">You can\'t link this telegram account to this user.</div>';
-                    return new HtmlResponse($content);
+                    $this->processContinue(false);
                 }
 
                 $user->loginProviders()->create(compact('provider', 'identifier'));
-                $content = '<script>window.close();window.opener.document.location.reload(true);</script>';
-
-                return new HtmlResponse($content);
+                $this->processContinue(true);
             }
 
             $suggestions = [];
@@ -69,12 +68,36 @@ class TelegramAuthController implements RequestHandlerInterface
                 }
             );
         } catch (Exception $e) {
+            $this->processContinue(false);
             // 在异常情况下返回错误响应
             return new HtmlResponse('Error: ' . $e->getMessage(), 500);
         }
     }
 
-
+    public function processContinue(bool $isSuccess): HtmlResponse
+    {
+        $url = resolve(UrlGenerator::class)->to('forum');
+        $translator = resolve(Translator::class);
+        if(!$isSuccess){
+            $redirect = $url->base().'/settings';
+            $href = htmlentities($redirect);
+            $continue = htmlentities($translator->trans('clarkwinkelmann-auth-popup-failsafe.api.auth.continue'));
+            $newBody = new Stream('php://temp', 'wb+');
+            $info = "You can\'t link this telegram account to this user.";
+            $newBody->write("<style>body{text-align:center;padding:20px;padding-top:40vh}p{font-family:sans-serif;font-size:2em;color:#aaa}a{color:#333}</style><p>$info</p><p><a href=\"$href\">$continue</a></p>");
+            $newBody->rewind();
+            return new HtmlResponse($newBody);
+        }else {
+            $redirect = $url->base() . '/settings';
+            $href = htmlentities($redirect);
+            $info = htmlentities($translator->trans('clarkwinkelmann-auth-popup-failsafe.api.auth.info'));
+            $continue = htmlentities($translator->trans('clarkwinkelmann-auth-popup-failsafe.api.auth.continue'));
+            $newBody = new Stream('php://temp', 'wb+');
+            $newBody->write("<style>body{text-align:center;padding:20px;padding-top:40vh}p{font-family:sans-serif;font-size:2em;color:#aaa}a{color:#333}</style><p>$info</p><p><a href=\"$href\">$continue</a></p>");
+            $newBody->rewind();
+            return new HtmlResponse($newBody);
+        }
+    }
     protected function checkTelegramId($provider, $identifier)
     {
         $provider = LoginProvider::where(compact('provider', 'identifier'))->first();
