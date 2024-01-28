@@ -3,7 +3,7 @@
 namespace Nodeloc\Telegram\Listeners;
 
 use Flarum\Api\Serializer\ForumSerializer;
-use Flarum\Api\Event\Serializing;
+use Flarum\Settings\Event\Serializing;
 use Flarum\Settings\SettingsRepositoryInterface;
 
 class InjectSettings

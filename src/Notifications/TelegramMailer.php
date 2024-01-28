@@ -5,10 +5,13 @@ use Exception;
 use Flarum\Notification\Blueprint\BlueprintInterface;
 use Flarum\Notification\MailableInterface;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Flarum\User\LoginProvider;
+use Flarum\User\User;
 use Illuminate\Contracts\View\Factory;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Translation\Translator;
+use Nodeloc\Telegram\Listeners\AddUserAttributes;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Telegram\Bot\Api;
 use Telegram\Bot\Exceptions\TelegramSDKException;
@@ -52,19 +55,42 @@ class TelegramMailer
         $this->settings = $settings;
         $this->view = $view;
     }
-
+    /**
+     * @param User $actor
+     * @return int
+     */
+    protected function getTelegramId(User $actor)
+    {
+        $query = LoginProvider::where('user_id', '=', $actor->id);
+        $query->where('provider', '=', 'telegram');
+        $provider = $query->first();
+        return $provider->identifier;
+    }
     public function send(BlueprintInterface $blueprint, array $users): void
     {
         foreach ($users as $user) {
             if ($blueprint instanceof MailableInterface) {
                 $view = $this->pickBestView($blueprint->getEmailView());
                 $text = $this->view->make($view, compact('blueprint', 'user'))->render();
-            } else {
+            }else if ($blueprint instanceof BlueprintInterface) {
+                return;
+            }else{
                 throw new Exception('Notification not compatible with Telegram Mailer');
             }
             $telegram_id = $user->flagrow_telegram_id; // Assuming 'telegram_id' is the key for the user's Telegram ID in the array
+            if(!$telegram_id){
+                $telegram_id = $this->getTelegramId($user);
+                if($telegram_id){
+                    $user->flagrow_telegram_id = $telegram_id;
+                    $user->save();
+                }else{
+                    $user->flagrow_telegram_error = 'User telegram id is incorrect.';
+                    $user->save();
+                    return;
+                }
+            }
             try {
-                $response = $this->telegramclient->sendMessage([
+                $this->telegramclient->sendMessage([
                     'chat_id' => $telegram_id,
                     'text' => $text
                 ]);

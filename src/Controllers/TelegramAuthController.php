@@ -50,7 +50,7 @@ class TelegramAuthController implements RequestHandlerInterface
                 }
 
                 $user->loginProviders()->create(compact('provider', 'identifier'));
-                $content = '<script>window.opener.document.location.reload(true);</script>';
+                $content = '<script>window.close();window.opener.document.location.reload(true);</script>';
 
                 return new HtmlResponse($content);
             }
@@ -66,7 +66,7 @@ class TelegramAuthController implements RequestHandlerInterface
                     $registration->provide('username', $suggestions['username']);
                     $registration->provide('avatar_url', $suggestions['avatar_url']);
                     $registration->setPayload($suggestions);
-            }
+                }
             );
         } catch (Exception $e) {
             // 在异常情况下返回错误响应

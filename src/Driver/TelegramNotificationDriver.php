@@ -3,11 +3,14 @@
 namespace Nodeloc\Telegram\Driver;
 
 use Flarum\Notification\Driver\NotificationDriverInterface;
+use Flarum\Notification\MailableInterface;
 use Flarum\User\User;
 use Illuminate\Contracts\Queue\Queue;
 use Nodeloc\Telegram\Job\SendTelegramNotificationJob;
 use Flarum\Notification\Blueprint\BlueprintInterface;
-class TelegramNotificationDriver implements  NotificationDriverInterface
+use ReflectionClass;
+
+class TelegramNotificationDriver implements NotificationDriverInterface
 {
     /**
      * @var Queue
@@ -52,10 +55,13 @@ class TelegramNotificationDriver implements  NotificationDriverInterface
 
     public function registerType(string $blueprintClass, array $driversEnabledByDefault): void
     {
-        User::registerPreference(
-            User::getNotificationPreferenceKey($blueprintClass::getType(), 'telegram'),
-            'boolval',
-            in_array('telegram', $driversEnabledByDefault)
-        );
+        if ((new ReflectionClass($blueprintClass))->implementsInterface(MailableInterface::class)) {
+
+            User::registerPreference(
+                User::getNotificationPreferenceKey($blueprintClass::getType(), 'telegram'),
+                'boolval',
+                in_array('telegram', $driversEnabledByDefault)
+            );
+        }
     }
 }
