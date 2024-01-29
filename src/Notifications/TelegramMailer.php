@@ -1,77 +1,122 @@
 <?php
 
 namespace Nodeloc\Telegram\Notifications;
-
 use Exception;
 use Flarum\Notification\Blueprint\BlueprintInterface;
 use Flarum\Notification\MailableInterface;
-use Flarum\User\User;
 use Flarum\Settings\SettingsRepositoryInterface;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
+use Flarum\User\LoginProvider;
+use Flarum\User\User;
 use Illuminate\Contracts\View\Factory;
-use Flarum\Notification\Driver\NotificationDriverInterface;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Translation\Translator;
+use Nodeloc\Telegram\Listeners\AddUserAttributes;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Telegram\Bot\Api;
+use Telegram\Bot\Exceptions\TelegramSDKException;
+use Illuminate\Support\Arr;
+
 class TelegramMailer
 {
-    protected $client;
-    protected $views;
+    /**
+     * @var Mailer
+     */
+    protected $mailer;
 
-    public function __construct(SettingsRepositoryInterface $settings, Factory $views)
+    /**
+     * @var TranslatorInterface&Translator
+     */
+    protected $translator;
+
+    /**
+     * @var SettingsRepositoryInterface
+     */
+    protected $settings;
+
+    protected $view;
+
+    protected  $telegramclient;
+
+    /**
+     * @param TranslatorInterface&Translator $translator
+     * @throws TelegramSDKException
+     */
+    public function __construct(Mailer $mailer, TranslatorInterface $translator, SettingsRepositoryInterface $settings,Factory $view)
     {
+        $this->mailer = $mailer;
+        $this->translator = $translator;
         $token = $settings->get('nodeloc-telegram.botToken');
 
         if (!$token) {
-            throw new Exception('No bot token configured for Telegram');
+            throw new Exception('No bot token configured for TelegramProvide');
         }
-
-        $this->client = new Client([
-            'base_uri' => 'https://api.telegram.org/bot' . $token . '/',
-        ]);
-
-        $this->views = $views;
+        $this->telegramclient =  new Api($token);
+        $this->settings = $settings;
+        $this->view = $view;
     }
-
-    public function send(BlueprintInterface $blueprint, array $user): void
+    /**
+     * @param User $actor
+     * @return int
+     */
+    protected function getTelegramId(User $actor)
     {
-        $telegram_id ="";
-        if ($blueprint instanceof MailableInterface) {
-            $view = $this->pickBestView($blueprint->getEmailView());
+        $query = LoginProvider::where('user_id', '=', $actor->id);
+        $query->where('provider', '=', 'telegram');
+        $provider = $query->first();
+        return $provider->identifier;
+    }
+    public function send(BlueprintInterface $blueprint, array $users): void
+    {
+        foreach ($users as $user) {
+            if ($blueprint instanceof MailableInterface) {
+                $view = $this->pickBestView($blueprint->getEmailView());
+                $text = $this->view->make($view, compact('blueprint', 'user'))->render();
+            }else if ($blueprint instanceof BlueprintInterface) {
+                return;
+            }else{
+                throw new Exception('Notification not compatible with Telegram Mailer');
+            }
+            $telegram_id = $user->flagrow_telegram_id; // Assuming 'telegram_id' is the key for the user's Telegram ID in the array
+            if(!$telegram_id){
+                $telegram_id = $this->getTelegramId($user);
+                if($telegram_id){
+                    $user->flagrow_telegram_id = $telegram_id;
+                    $user->save();
+                }else{
+                    $user->flagrow_telegram_error = 'User telegram id is incorrect.';
+                    $user->save();
+                    return;
+                }
+            }
+            try {
+                $this->telegramclient->sendMessage([
+                    'chat_id' => $telegram_id,
+                    'text' => $text
+                ]);
 
-            $text = $this->views->make($view, compact('blueprint', 'user'))->render();
-        } else {
-            throw new Exception('Notification not compatible with Telegram Mailer');
-        }
+                // Reset error if everything went right
+                if ($user->flagrow_telegram_error) {
+                    $user->flagrow_telegram_error = null;
+                    $user->save();
+                }
+            } catch (ClientException $exception) {
+                $response = $exception->getResponse();
+                if ($response && $response->getStatusCode() !== 403) {
+                    throw $exception;
+                }
+                $user->flagrow_telegram_error = 'unauthorized';
+                $json = json_decode($response->getBody()->getContents(), true);
 
-        try {
-            $this->client->post('sendMessage', [
-                'query' => [
-                    'chat_id' => (int)$telegram_id,
-                    'text' => $text,
-                    'parse_mode' => 'HTML',
-                ],
-            ]);
+                if ($json && str_contains(Arr::get($json, 'description', ''), 'blocked by the user')) {
+                    $user->flagrow_telegram_error = 'blocked';
+                }
 
-            // Reset error if everything went right
-            if ($user->flagrow_telegram_error) {
-                $user->flagrow_telegram_error = null;
+                $user->save();
+            } catch (TelegramSDKException $exception) {
+                $user->flagrow_telegram_error = 'unauthorized';
                 $user->save();
             }
-        } catch (ClientException $exception) {
-            $response = $exception->getResponse();
-
-            if ($response->getStatusCode() !== 403) {
-                throw $exception;
-            }
-
-            $user->flagrow_telegram_error = 'unauthorized';
-
-            $json = json_decode($response->getBody()->getContents(), true);
-
-            if ($json && str_contains(array_get($json, 'description', ''), 'blocked by the user')) {
-                $user->flagrow_telegram_error = 'blocked';
-            }
-
-            $user->save();
         }
     }
 
@@ -92,19 +137,19 @@ class TelegramMailer
                 return $view[0];
             }
 
-            $html = array_get($view, 'html');
+            $html = Arr::get($view, 'html');
 
             if ($html) {
                 return $html;
             }
 
-            $text = array_get($view, 'text');
+            $text = Arr::get($view, 'text');
 
             if ($text) {
                 return $text;
             }
 
-            $raw = array_get($view, 'raw');
+            $raw = Arr::get($view, 'raw');
 
             if ($raw) {
                 return $raw;

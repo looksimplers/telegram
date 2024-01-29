@@ -37,6 +37,6 @@ class AddUserAttributes
 
         $provider = $query->first();
 
-        return $provider->identifier;
+        return optional($provider)->identifier;
     }
 }
